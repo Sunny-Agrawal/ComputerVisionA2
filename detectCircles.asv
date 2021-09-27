@@ -11,9 +11,9 @@ paddedPointColumns = pointColumns + (radius - 1);
 relCoords = relCircleCoords(radius);
 edgeSize = size(edgesMat);
 %make padded edges matrix to accomodate circles partially out of bounds
-numPaddedVotesRows = edgeSize(1) + (radius - 1) * 2;
-numPaddedVotesColumns = edgeSize(2) + (radius - 1) * 2;
-paddedVotesMat = zeros(numPaddedVotesRows, numPaddedVotesColumns);
+paddedVotesRows = edgeSize(1) + (radius - 1) * 2;
+paddedVotesColumns = edgeSize(2) + (radius - 1) * 2;
+paddedVotesMat = zeros(paddedVotesRows, paddedVotesColumns);
 
 %iterate through each edge point
 for pointNum = 1:size(paddedPointRows)
@@ -29,4 +29,5 @@ for pointNum = 1:size(paddedPointRows)
 end
 
 %remove the padding from the padded votes matrix.
-votes = paddedVotesMat(radius : numPaddedVotesRows - radius, radius : numPaddedVotesColumns - radius);
+votes = zeros(edgeSize(1), edgeSize(2));
+votes = paddedVotesMat(radius : 
