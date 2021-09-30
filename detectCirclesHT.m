@@ -1,8 +1,8 @@
-function centers = detectCircles(oImage, radius)
+function centers = detectCirclesHT(oImage, radius)
 threshPctg = .7;
 imMat = imread(oImage);
-greyMat = im2gray(imMat);
 %get edges as matrix of 0's and 1's. Edges are 1's
+greyMat = im2gray(imMat);
 greyMat = imgaussfilt(greyMat, 4);
 edgesMat = edge(greyMat);
 edgesMat = uint8(edgesMat);
