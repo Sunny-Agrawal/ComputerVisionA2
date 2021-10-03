@@ -20,11 +20,14 @@ bestFitNumInliers;
 curCenter;
 curNumInliers;
 bfPointsToRemove = zeros(size(pointRows));
+
 bfNumPointsToRemove = 0;
+
 successiveFails=0;
 allFound = false;
+numEdgePoints = size(pointRows);
 %Core loop
-while allFound == false
+while !allFound
     %get a random pixel to try as a center.
     centerR = randi(imSize(1), 1, 1);
     centerC = randi(imSize(2), 2, 2);
@@ -59,16 +62,15 @@ while allFound == false
             if bestFitNumInliers >= threshInliers
                 %best fit is a circle. Store its center
                 numCenters = numCenters + 1;
-                centers(numCenters, 1:2) = bestFitCenter(1:2);
+                centers(numCenters, 1:2) = bestFitCenter;
                 %remove all points in this best fit from pointRows,
                 %pointColumns
                 numRemoved = 0;
                 for p = 1 : bfNumPointsToRemove
-                    pointIndex = bfPointsToRemove(p) - numRemoved;
-                    pointRows(pointIndex) = [];
-                    pointColumns(pointIndex) = [];
-                    numRemoved = numRemoved + 1;
-                end    
+                    pointIndex = bfPointsToRemove(p);
+                    
+                end
+                
             else
                 allFound = true;
             end
@@ -76,7 +78,6 @@ while allFound == false
             
     end
 end
-viscircles(centers, radius);
 
 
 
