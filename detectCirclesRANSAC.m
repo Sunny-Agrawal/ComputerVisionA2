@@ -64,7 +64,8 @@ while allFound == false
                 %pointColumns
                 numRemoved = 0;
                 for p = 1 : bfNumPointsToRemove
-                    pointIndex = bfPointsToRemove(p) - numRemoved
+                    rawIndex = bfPointsToRemove(p);
+                    pointIndex = bfPointsToRemove(p) - p + 1;
                     if pointIndex > size(pointRows);
                         pointIndex
                     end
