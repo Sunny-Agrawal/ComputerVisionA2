@@ -1,9 +1,10 @@
 function centers = detectCirclesRANSAC(oImage, radius);
+centers = [0, 0];
 numCenters = 0;
 outerbound = radius * 1.02;
 innerbound = radius * .98;
-threshInliers = 3.14 * radius^2 * .98;
-successiveFailLim = 8;
+threshInliers = 3.14 * radius * 2 * .25;
+successiveFailLim = 1000;
 imMat = imread(oImage);
 imSize = size(imMat);
 %get edges as matrix of 0's and 1's. Edges are 1's
@@ -15,23 +16,19 @@ subplot(1, 2, 1)
 imagesc(edgesMat);
 %get coordinates of edge points and prep best fit storage.
 [pointRows, pointColumns] = find(edgesMat);
-bestFitCenter;
-bestFitNumInliers;
-curCenter;
-curNumInliers;
+bestFitCenter = [0,0];
+bestFitNumInliers = 0;
 bfPointsToRemove = zeros(size(pointRows));
-
 bfNumPointsToRemove = 0;
-
 successiveFails=0;
 allFound = false;
-numEdgePoints = size(pointRows);
 %Core loop
-while !allFound
+while allFound == false
     %get a random pixel to try as a center.
     centerR = randi(imSize(1), 1, 1);
-    centerC = randi(imSize(2), 2, 2);
+    centerC = randi(imSize(2), 1, 1);
     curCenter = [centerR, centerC];
+    curNumInliers = 0;
     curNumPointsToRemove = 0;
     curPointsToRemove = zeros(size(pointRows));
     %find inliers
@@ -44,7 +41,7 @@ while !allFound
         %compare to bounds.
         if distance <= outerbound
             curNumPointsToRemove = curNumPointsToRemove + 1;
-            curPointsToRemove(curNumPointsToRemove) = [pointNum];
+            curPointsToRemove(curNumPointsToRemove) = pointNum];
             if distance >= innerbound
                 curNumInliers = curNumInliers + 1;
             end
@@ -62,15 +59,16 @@ while !allFound
             if bestFitNumInliers >= threshInliers
                 %best fit is a circle. Store its center
                 numCenters = numCenters + 1;
-                centers(numCenters, 1:2) = bestFitCenter;
+                centers(numCenters, 1:2) = bestFitCenter(1:2);
                 %remove all points in this best fit from pointRows,
                 %pointColumns
                 numRemoved = 0;
                 for p = 1 : bfNumPointsToRemove
-                    pointIndex = bfPointsToRemove(p);
-                    
-                end
-                
+                    pointIndex = bfPointsToRemove(p) - numRemoved;
+                    pointRows(pointIndex) = [];
+                    pointColumns(pointIndex) = [];
+                    numRemoved = numRemoved + 1;
+                end    
             else
                 allFound = true;
             end
@@ -78,6 +76,7 @@ while !allFound
             
     end
 end
+viscircles(centers, radius);
 
 
 

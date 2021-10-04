@@ -1,9 +1,10 @@
 function centers = detectCirclesRANSAC(oImage, radius);
+centers = [0, 0];
 numCenters = 0;
 outerbound = radius * 1.02;
 innerbound = radius * .98;
-threshInliers = 3.14 * radius^2 * .98;
-successiveFailLim = 8;
+threshInliers = 3.14 * radius * 2 * .25;
+successiveFailLim = 10000;
 imMat = imread(oImage);
 imSize = size(imMat);
 %get edges as matrix of 0's and 1's. Edges are 1's
@@ -15,10 +16,8 @@ subplot(1, 2, 1)
 imagesc(edgesMat);
 %get coordinates of edge points and prep best fit storage.
 [pointRows, pointColumns] = find(edgesMat);
-bestFitCenter;
-bestFitNumInliers;
-curCenter;
-curNumInliers;
+bestFitCenter = [0,0];
+bestFitNumInliers = 0;
 bfPointsToRemove = zeros(size(pointRows));
 bfNumPointsToRemove = 0;
 successiveFails=0;
@@ -27,8 +26,9 @@ allFound = false;
 while allFound == false
     %get a random pixel to try as a center.
     centerR = randi(imSize(1), 1, 1);
-    centerC = randi(imSize(2), 2, 2);
+    centerC = randi(imSize(2), 1, 1);
     curCenter = [centerR, centerC];
+    curNumInliers = 0;
     curNumPointsToRemove = 0;
     curPointsToRemove = zeros(size(pointRows));
     %find inliers
@@ -41,7 +41,7 @@ while allFound == false
         %compare to bounds.
         if distance <= outerbound
             curNumPointsToRemove = curNumPointsToRemove + 1;
-            curPointsToRemove(curNumPointsToRemove) = [pointNum];
+            curPointsToRemove(curNumPointsToRemove) = pointNum;
             if distance >= innerbound
                 curNumInliers = curNumInliers + 1;
             end
@@ -64,7 +64,10 @@ while allFound == false
                 %pointColumns
                 numRemoved = 0;
                 for p = 1 : bfNumPointsToRemove
-                    pointIndex = bfPointsToRemove(p) - numRemoved;
+                    pointIndex = bfPointsToRemove(p) - numRemoved
+                    if pointIndex > size(pointRows);
+                        pointIndex
+                    end
                     pointRows(pointIndex) = [];
                     pointColumns(pointIndex) = [];
                     numRemoved = numRemoved + 1;
