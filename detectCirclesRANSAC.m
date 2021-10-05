@@ -4,12 +4,12 @@ numCenters = 0;
 outerbound = radius * 1.02;
 innerbound = radius * .98;
 threshInliers = 3.14 * radius * 2 * .25;
-successiveFailLim = 10000;
+successiveFailLim = 100000;
 imMat = imread(oImage);
 imSize = size(imMat);
 %get edges as matrix of 0's and 1's. Edges are 1's
 greyMat = im2gray(imMat);
-greyMat = imgaussfilt(greyMat, 4);
+%greyMat = imgaussfilt(greyMat, 4);
 edgesMat = edge(greyMat);
 edgesMat = uint8(edgesMat);
 subplot(1, 2, 1)
@@ -66,13 +66,14 @@ while allFound == false
                 for p = 1 : bfNumPointsToRemove
                     rawIndex = bfPointsToRemove(p);
                     pointIndex = bfPointsToRemove(p) - p + 1;
-                    if pointIndex > size(pointRows);
+                    if pointIndex > size(pointRows)
                         pointIndex
                     end
                     pointRows(pointIndex) = [];
                     pointColumns(pointIndex) = [];
                     numRemoved = numRemoved + 1;
-                end    
+                end
+                bestFitNumInliers = 0;
             else
                 allFound = true;
             end
@@ -80,7 +81,10 @@ while allFound == false
             
     end
 end
-viscircles(centers, radius);
+sizeCenters = size(centers);
+radii = zeros(sizeCenters(1), 1);
+radii = radii + radius;
+viscircles(centers, radii);
 
 
 

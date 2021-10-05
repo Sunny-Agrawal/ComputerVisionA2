@@ -1,5 +1,5 @@
 function centers = detectCirclesHT(oImage, radius)
-threshPctg = .7;
+threshPctg = .5;
 imMat = imread(oImage);
 %get edges as matrix of 0's and 1's. Edges are 1's
 greyMat = im2gray(imMat);
@@ -41,7 +41,32 @@ imagesc(votes);
 highestVote = max(votes, [], 'all');
 threshold = round(highestVote * threshPctg);
 [centerRows, centerColumns] = find(votes > threshold);
-centers = [centerRows, centerColumns];
+%remove centers that likely pertain to textures. These will likely be very
+%close to other centers.
+centers = 0;
+for i = 1 : size(centerRows)
+    c = [centerRows(i), centerColumns(i)];
+    isOkay = true;
+    stillVetting = true;
+    vetI = 1;
+    while stillVetting & vetI <= size(centerRows)
+        if vetI == i
+        else
+            vetC = [centerRows(vetI), centerColumns(vetI)];
+            distance = sqrt((vetC(1) - c(1))^2 + (vetC(2) - c(2))^2);
+            if distance < (2 * radius)
+                stillVetting = false;
+                isOkay = false;
+            end
+        end
+        vetI = vetI + 1;
+    end
+    if isOkay
+        centers(end, 1:2) = c(1, 1:2);
+    end
+end
+centerRows = centers(:, 1);
+centerColumns = centers(:, 2);
 numCenters = size(centerRows);
 %draw circles of given radius around centers
 drawnCircles = imMat;
