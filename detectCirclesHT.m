@@ -1,13 +1,13 @@
 function centers = detectCirclesHT(oImage, radius)
-threshPctg = .5;
+threshPctg = .4;
 imMat = imread(oImage);
 %get edges as matrix of 0's and 1's. Edges are 1's
 greyMat = im2gray(imMat);
 greyMat = imgaussfilt(greyMat, 4);
 edgesMat = edge(greyMat);
 edgesMat = uint8(edgesMat);
-subplot(1, 2, 1)
-imagesc(edgesMat);
+% subplot(1, 2, 1)
+% imagesc(edgesMat);
 %get coordinates of edge points
 [pointRows, pointColumns] = find(edgesMat);
 paddedPointRows = pointRows + (radius);
@@ -44,17 +44,21 @@ threshold = round(highestVote * threshPctg);
 %remove centers that likely pertain to textures. These will likely be very
 %close to other centers.
 centers = 0;
+centerRowsSize = size(centerRows);
+numToVet = centerRowsSize(1);
 for i = 1 : size(centerRows)
     c = [centerRows(i), centerColumns(i)];
+    centerVotes = votes(c(1), c(2));
     isOkay = true;
     stillVetting = true;
     vetI = 1;
-    while stillVetting & vetI <= size(centerRows)
+    while stillVetting & vetI <= numToVet
         if vetI == i
         else
             vetC = [centerRows(vetI), centerColumns(vetI)];
+            vetCVotes = votes(vetC(1), vetC(2));
             distance = sqrt((vetC(1) - c(1))^2 + (vetC(2) - c(2))^2);
-            if distance < (2 * radius)
+            if distance < (2 * radius) & centerVotes < vetCVotes
                 stillVetting = false;
                 isOkay = false;
             end
@@ -62,9 +66,10 @@ for i = 1 : size(centerRows)
         vetI = vetI + 1;
     end
     if isOkay
-        centers(end, 1:2) = c(1, 1:2);
+        centers(end + 1, 1:2) = c(1, 1:2);
     end
 end
+centers = centers(2:end, 1:2);
 centerRows = centers(:, 1);
 centerColumns = centers(:, 2);
 numCenters = size(centerRows);
