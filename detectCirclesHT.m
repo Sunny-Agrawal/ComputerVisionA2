@@ -1,9 +1,9 @@
 function centers = detectCirclesHT(oImage, radius)
-threshPctg = .4;
+threshPctg = .35;
 imMat = imread(oImage);
 %get edges as matrix of 0's and 1's. Edges are 1's
 greyMat = im2gray(imMat);
-greyMat = imgaussfilt(greyMat, 4);
+% greyMat = imgaussfilt(greyMat, 4);
 edgesMat = edge(greyMat);
 edgesMat = uint8(edgesMat);
 % subplot(1, 2, 1)

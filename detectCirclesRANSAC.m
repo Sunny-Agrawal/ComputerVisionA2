@@ -1,10 +1,10 @@
 function centers = detectCirclesRANSAC(oImage, radius);
 centers = [0, 0];
 numCenters = 0;
-outerbound = radius * 1.02;
-innerbound = radius * .98;
+outerbound = radius + 2;
+innerbound = radius - 2;
 threshInliers = 3.14 * radius * 2 * .25;
-successiveFailLim = 100000;
+successiveFailLim = 10000;
 imMat = imread(oImage);
 imSize = size(imMat);
 %get edges as matrix of 0's and 1's. Edges are 1's
@@ -12,7 +12,7 @@ greyMat = im2gray(imMat);
 %greyMat = imgaussfilt(greyMat, 4);
 edgesMat = edge(greyMat);
 edgesMat = uint8(edgesMat);
-subplot(1, 2, 1)
+%subplot(1, 2, 1)
 imagesc(edgesMat);
 %get coordinates of edge points and prep best fit storage.
 [pointRows, pointColumns] = find(edgesMat);
@@ -22,6 +22,14 @@ bfPointsToRemove = zeros(size(pointRows));
 bfNumPointsToRemove = 0;
 successiveFails=0;
 allFound = false;
+%sample squares of the image that are a certain number of radii in length
+%and height. Squares will overlap eachother 50%
+sampleDimension = radius * 4;
+sampleIncrement = sampleDimension/2;
+sampleLeftBound = 0;
+sampleRightBound = sampleDimension;
+sampleTopBound = 0;
+sampleBottomBound = sampleDimension;
 %Core loop
 while allFound == false
     %get a random pixel to try as a center.
@@ -81,10 +89,29 @@ while allFound == false
             
     end
 end
-sizeCenters = size(centers);
-radii = zeros(sizeCenters(1), 1);
-radii = radii + radius;
-viscircles(centers, radii);
+% sizeCenters = size(centers);
+% radii = zeros(sizeCenters(1), 1);
+% radii = radii + radius;
+% viscircles(centers, radii);
+relCoords = relCircleCoords(radius);
+centerRows = centers(:, 1);
+centerColumns = centers(:, 2);
+numCenters = size(centerRows);
+%draw circles of given radius around centers
+drawnCircles = imMat;
+for cNum = 1 : numCenters(1)
+    centerR = centerRows(cNum);
+    centerC = centerColumns(cNum);
+    circleRows = relCoords(:, 1) + centerR;
+    circleColumns = relCoords(:, 2) + centerC;
+    numCirclePoints = size(circleRows);
+    for pointNum = 1 : numCirclePoints
+        pointR = circleRows(pointNum);
+        pointC = circleColumns(pointNum);
+        drawnCircles(pointR, pointC, :) = [255, 0, 0];
+    end
+end
+imwrite(drawnCircles, 'drawnCirclesRANSAC.jpg');
 
 
 
