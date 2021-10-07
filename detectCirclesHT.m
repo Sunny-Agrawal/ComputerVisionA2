@@ -34,8 +34,9 @@ end
 
 %remove the padding from the padded votes matrix.
 votes = paddedVotesMat(radius + 1 : numPaddedVotesRows - (radius), (radius + 1) : numPaddedVotesColumns - (radius));
-subplot(1, 2, 2);
+% subplot(1, 2, 2);
 imagesc(votes);
+title('soccerballs Hough Space Accumulator')
 
 %Get the coordinates of points above the threshold value.
 highestVote = max(votes, [], 'all');
@@ -72,21 +73,27 @@ end
 centers = centers(2:end, 1:2);
 centerRows = centers(:, 1);
 centerColumns = centers(:, 2);
-numCenters = size(centerRows);
+numCenters = size(centerRows, 1);
 %draw circles of given radius around centers
-drawnCircles = imMat;
-for cNum = 1 : numCenters(1)
-    centerR = centerRows(cNum);
-    centerC = centerColumns(cNum);
-    circleRows = relCoords(:, 1) + centerR;
-    circleColumns = relCoords(:, 2) + centerC;
-    numCirclePoints = size(circleRows);
-    for pointNum = 1 : numCirclePoints
-        pointR = circleRows(pointNum);
-        pointC = circleColumns(pointNum);
-        drawnCircles(pointR, pointC, :) = [255, 0, 0];
-    end
-end
-imwrite(drawnCircles, 'drawnCircles.jpg');
+% drawnCircles = imMat;
+% for cNum = 1 : numCenters(1)
+%     centerR = centerRows(cNum);
+%     centerC = centerColumns(cNum);
+%     circleRows = relCoords(:, 1) + centerR;
+%     circleColumns = relCoords(:, 2) + centerC;
+%     numCirclePoints = size(circleRows);
+%     for pointNum = 1 : numCirclePoints
+%         pointR = circleRows(pointNum);
+%         pointC = circleColumns(pointNum);
+%         drawnCircles(pointR, pointC, :) = [255, 0, 0];
+%     end
+% end
+imshow(oImage);
+xyCenters = zeros(numCenters, 2);
+xyCenters(:, 1) = centerColumns(:, 1);
+xyCenters(:, 2) = centerRows(:, 1);
+radii = zeros(1, numCenters) + radius;
+viscircles(xyCenters, radii); 
+title('soccerballs.jpg HT radius 60');
 
 
